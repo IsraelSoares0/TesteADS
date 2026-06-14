@@ -1,0 +1,4 @@
+- [x] Escrever relatório inicial
+- [x] Realizar testes para diversos valores de SPS
+- [ ] Realizar novos testes mantendo o circuito constante
+- [ ] Realizar teste com os 8 canais conectados simultaneamente
