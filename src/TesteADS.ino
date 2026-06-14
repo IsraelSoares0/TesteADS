@@ -9,9 +9,9 @@
 #define PIN_RESET       2
 #define PIN_CS          5
 // Amostras por segundo
-#define VALIDATION_SECONDS
-#define SPS             DRATE_30000SPS
-#define N_SAMPLES       (VALIDATION_SECONDS * 30000)
+#define VALIDATION_SECONDS  3
+#define SPS                 DRATE_30000SPS
+#define N_SAMPLES           (VALIDATION_SECONDS * 30000)
 
 // SPS Rates
 /*
