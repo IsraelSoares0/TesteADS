@@ -10,8 +10,8 @@
 #define PIN_CS          5
 // Amostras por segundo
 #define VALIDATION_SECONDS  3
-#define SPS                 DRATE_30000SPS
-#define N_SAMPLES           (VALIDATION_SECONDS * 30000)
+#define SPS                 DRATE_50SPS
+#define N_SAMPLES           (VALIDATION_SECONDS * 50)
 
 // SPS Rates
 /*
@@ -176,8 +176,8 @@ void tReport(void *_) {
                 diff_mean = 0.0f;
             }
 
-            Serial.printf("Diferenca media entre canais : %.6f V  (%.2f LSB)\n",
-                        diff_mean, diff_mean / LSB);
+            Serial.printf("Diferenca media entre canais : %.6f V\n",
+                        diff_mean);
 
             if (diff_mean < 0.001f)
                 Serial.println("Canais : OK         (diferenca media < 1 mV)");
@@ -213,7 +213,7 @@ void setup() {
     }
  
     xTaskCreate(tValidate, "Validate", 8192, NULL, 2, NULL);
-    xTaskCreate(tReport,   "Report",   4096, NULL, 1, NULL);
+    xTaskCreate(tReport,   "Report",   8192, NULL, 1, NULL);
  
     Serial.println("Iniciando validacao dos canais AIN0 e AIN1...");
 }

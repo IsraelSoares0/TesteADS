@@ -1,4 +1,6 @@
 - [x] Escrever relatório inicial
 - [x] Realizar testes para diversos valores de SPS
-- [ ] Realizar novos testes mantendo o circuito constante
+- [x] Realizar novos testes mantendo o circuito constante
+- [x] Escrever código para teste do ADS salvando os dados para um cartao SD
+- [ ] Implementar código de análise de dados do SD card com python
 - [ ] Realizar teste com os 8 canais conectados simultaneamente
