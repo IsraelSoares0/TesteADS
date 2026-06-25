@@ -29,7 +29,7 @@ def carregar_dados(file) -> pd.DataFrame:
         for canal, grupo in df_total.groupby("ch")
     }
 
-    return dados_por_canal
+    return df_total, dados_por_canal
 
 
 def obter_estatisticas(df: pd.DataFrame, tensao_esperada: float) -> dict:
@@ -74,6 +74,7 @@ def obter_estatisticas(df: pd.DataFrame, tensao_esperada: float) -> dict:
     canal = df["ch"].unique()
     
     estatisticas = {
+        "canal": canal,
         "tensao_esperada": tensao_esperada,
         "media": media,
         "erro_absoluto": erro_absoluto,
@@ -83,18 +84,18 @@ def obter_estatisticas(df: pd.DataFrame, tensao_esperada: float) -> dict:
         "maximo": maximo,
         "ruido": ruido,
         "quantidade_amostras": len(tensoes),
-        "canal": canal,
     }
     
     return estatisticas
 
 def obter_estatisticas_por_canal(dados_por_canal: dict, tensao_esperada: float) -> dict:
-    estatisticas = []
-    
-    for df_canal in dados_por_canal.values():
+    estatisticas = {}
+
+    for canal, df_canal in dados_por_canal.items():
         stats = obter_estatisticas(df_canal, tensao_esperada)
-        estatisticas.append(stats)
-    
+
+        estatisticas[canal] = stats
+
     return estatisticas
 
 
