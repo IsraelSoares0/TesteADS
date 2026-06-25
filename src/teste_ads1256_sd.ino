@@ -84,9 +84,6 @@ void realizarColeta(int numero) {
         return;
     }
 
-    // Cabeçalho do CSV
-    arquivo.println("indice,canal,nome_canal,tensao");
-
     for (int ch = 0; ch < N_CHANNELS; ch++) {
         adc.setMUX(MUX_CH[ch]);
 
@@ -101,11 +98,9 @@ void realizarColeta(int numero) {
 
             arquivo.print(i);
             arquivo.print(",");
-            arquivo.print(ch);
+            arquivo.print(tensao, 6);
             arquivo.print(",");
-            arquivo.print(CH_NAME[ch]);
-            arquivo.print(",");
-            arquivo.println(tensao, 6);
+            arquivo.println(ch);
         }
     }
 
