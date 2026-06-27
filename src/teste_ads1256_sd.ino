@@ -77,7 +77,7 @@ void realizarColeta(int numero) {
     Serial.print("Criando arquivo: ");
     Serial.println(nomeArquivo);
 
-    File arquivo = SD.open(nomeArquivo, FILE_WRITE);
+    File arquivo = SD.open(nomeArquivo, FILE_APPEND);
 
     if (!arquivo) {
         Serial.println("Erro ao abrir arquivo no SD.");
@@ -93,8 +93,7 @@ void realizarColeta(int numero) {
             long raw = adc.readSingle();
             float tensao = adc.convertToVoltage(raw);
 
-            float erro = tensao - V_EXPECTED;
-            float erroPercentual = (erro / V_EXPECTED) * 100.0f;
+            Serial.println(tensao);
 
             arquivo.print(i);
             arquivo.print(",");
