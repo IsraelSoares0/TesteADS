@@ -4,22 +4,43 @@
 #include <SD.h>
 
 // =============================
-// Configurações do ADS1256
+// Criação de objetos SPI diferentes
 // =============================
-#define ADSvRef         2.5f
-#define PIN_DRDY        17
-#define PIN_RESET       2
-#define PIN_CS_ADS      5
+
+
+SPIClass spiADS(VSPI);
+SPIClass spiSD(HSPI);
+
 
 // =============================
-// Configurações do SD Card
+// ADS1256 - VSPI
 // =============================
-#define PIN_CS_SD       4
+
+
+#define ADSvRef         2.5f
+#define ADS_SCK         18
+#define ADS_MISO        19
+#define ADS_MOSI        23
+#define PIN_CS_ADS      5
+
+#define PIN_DRDY        17
+#define PIN_RESET       25
+
+// =============================
+// SD Card - HSPI
+// =============================
+
+#define SD_SCK          14
+#define SD_MISO         27
+#define SD_MOSI         13
+#define PIN_CS_SD       16
 
 // =============================
 // Configurações do teste
 // =============================
+
 #define VALIDATION_SECONDS  3
+#define DEBUG               true
 
 #define SPS_CODE            DRATE_50SPS
 #define SPS_VALUE           50
@@ -29,7 +50,7 @@
 
 #define V_EXPECTED          1.650f
 
-ADS1256 adc(PIN_DRDY, PIN_RESET, ADS1256::PIN_UNUSED, PIN_CS_ADS, ADSvRef, &SPI);
+ADS1256 adc(PIN_DRDY, PIN_RESET, ADS1256::PIN_UNUSED, PIN_CS_ADS, ADSvRef, &spiADS);
 
 // SPS Rates
 /*
@@ -63,7 +84,7 @@ const char* CH_NAME[8] = {
 };
 
 
-void realizarColeta(int numero) {
+void realizarColeta(int numero, bool debug) {
     char nomeArquivo[32];
 
     snprintf(
@@ -93,7 +114,9 @@ void realizarColeta(int numero) {
             long raw = adc.readSingle();
             float tensao = adc.convertToVoltage(raw);
 
-            Serial.println(tensao);
+            if debug {
+                Serial.println(tensao);
+            }
 
             arquivo.print(i);
             arquivo.print(",");
@@ -111,9 +134,7 @@ void realizarColeta(int numero) {
 
 void setup() {
     Serial.begin(115200);
-
-    Serial.println("Inicializando SPI...");
-    SPI.begin();
+    delay(500);
 
     pinMode(PIN_CS_ADS, OUTPUT);
     pinMode(PIN_CS_SD, OUTPUT);
@@ -121,11 +142,39 @@ void setup() {
     digitalWrite(PIN_CS_ADS, HIGH);
     digitalWrite(PIN_CS_SD, HIGH);
 
+    Serial.println("Inicializando SPI do ADS1256...");
+    spiADS.begin(ADS_SCK, ADS_MISO, ADS_MOSI, PIN_CS_ADS);
+    delay(100);
+
+    Serial.println("Inicializando SPI do SD card...");
+    spiSD.begin(SD_SCK, SD_MISO, SD_MOSI, PIN_CS_SD);
+    delay(100);
+
+
+    // =============================
+    // Inicialização do SD Card
+    // =============================
+
+
+    Serial.println("Inicializando SD card...");
+
+    if (!SD.begin(PIN_CS_SD, spiSD)) {
+        Serial.println("SD card ERROR");
+        while (true);
+    }
+
+    Serial.println("SD card OK");
+
+
     // =============================
     // Inicialização do ADS1256
     // =============================
 
+
     Serial.println("Inicializando ADS1256...");
+
+    digitalWrite(PIN_CS_SD, HIGH);
+    digitalWrite(PIN_CS_ADS, HIGH);
 
     adc.InitializeADC();
     adc.setDRATE(SPS_CODE);
@@ -136,20 +185,6 @@ void setup() {
     Serial.println(status, BIN);
 
     Serial.println("ADS1256 inicializado.");
-
-    // =============================
-    // Inicialização do SD Card
-    // =============================
-    
-    Serial.println("Inicializando SD card...");
-
-    if (!SD.begin(PIN_CS_SD)) {
-        Serial.println("SD card ERROR");
-        while (true);
-    }
-
-    Serial.println("SD card OK");
-
     Serial.println("Iniciando teste dos canais...");
 }
 
@@ -157,7 +192,7 @@ void setup() {
 void loop() {
     static int numeroColeta = 0;
 
-    realizarColeta(numeroColeta);
+    realizarColeta(numeroColeta, DEBUG);
 
     numeroColeta++;
 
