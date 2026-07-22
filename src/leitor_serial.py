@@ -66,24 +66,30 @@ def ler_pacote(ser: serial.Serial):
     return amostras
 
 
+AMOSTRAS_POR_ARQUIVO = 10000
+
+
 def main():
     with serial.Serial(PORTA, BAUD, timeout=1) as ser:
         print(f"Conectado em {PORTA} @ {BAUD} bps")
 
-        with open("coleta.csv", "w") as arquivo:
-            arquivo.write("indice,canal,tensao\n")
+        for i in range(5):
+            with open(f"coleta{i}.csv", "w") as arquivo:
+                arquivo.write("indice,canal,tensao\n")
 
-            while True:
-                amostras = ler_pacote(ser)
-                if amostras is None:
-                    continue
+                total_amostras = 0
+                while total_amostras < AMOSTRAS_POR_ARQUIVO:
+                    amostras = ler_pacote(ser)
+                    if amostras is None:
+                        continue
 
-                for indice, canal, tensao in amostras:
-                    linha = f"{indice},{canal},{tensao:.6f}"
-                    arquivo.write(linha + "\n")
-                    print(linha)
+                    for indice, canal, tensao in amostras:
+                        linha = f"{indice},{canal},{tensao:.6f}"
+                        arquivo.write(linha + "\n")
+                        print(linha)
+                        total_amostras += 1
 
-                arquivo.flush()
+                    arquivo.flush()
 
 
 if __name__ == "__main__":

@@ -1,5 +1,4 @@
 #include <ADS1256.h>
-#include <math.h>
 #include <SPI.h>
 
 #include "freertos/FreeRTOS.h"
@@ -25,13 +24,11 @@ SPIClass spiADS(VSPI);
 // Configurações do teste
 // =============================
 
-#define SPS_CODE            DRATE_50SPS
-#define SPS_VALUE           50
+#define SPS_CODE            DRATE_2000SPS
+#define SPS_VALUE           2000
 
 #define N_CHANNELS          2
-#define N_SAMPLES           10000 / N_CHANNELS
-
-#define V_EXPECTED          1.650f
+#define N_SAMPLES           10000
 
 ADS1256 adc(PIN_DRDY, PIN_RESET, ADS1256::PIN_UNUSED, PIN_CS_ADS, ADSvRef, &spiADS);
 
@@ -105,11 +102,12 @@ void taskADS1256(void *pvParameters) {
     uint32_t indiceGlobal = 0;
 
     while(true) {
-        for (int ch = 0; ch < N_CHANNELS; ch++) {
-            adc.setMUX(MUX_CH[ch]);
-            adc.readSingle(); // descarta a 1ª leitura
+        // Alterna entre os canais
+        for (int i = 0; i < N_SAMPLES; i++) {
+            for (int ch = 0; ch < N_CHANNELS; ch++) {
+                adc.setMUX(MUX_CH[ch]);
+                //adc.readSingle(); // descarta a 1ª leitura (settling do MUX)
 
-            for (int i = 0; i < N_SAMPLES; i++) {
                 long raw = adc.readSingle();
                 float tensao = adc.convertToVoltage(raw);
 
@@ -118,15 +116,11 @@ void taskADS1256(void *pvParameters) {
                 amostra.canal  = (uint8_t)ch;
                 amostra.tensao = tensao;
 
-                // Envia para a fila; se ficar cheia por >20ms, descarta a
-                // amostra em vez de travar a coleta (a task Serial não está
-                // acompanhando o ritmo -> aumente QUEUE_LENGTH/BATCH_SIZE
-                // ou o baud rate se isso acontecer com frequência).
+                // Envia para a fila
                 xQueueSend(filaAmostras, &amostra, pdMS_TO_TICKS(20));
             }
         }
 
-        // Pausa entre rodadas de coleta
         vTaskDelay(pdMS_TO_TICKS(5000));
     }
 }
