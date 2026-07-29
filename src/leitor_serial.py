@@ -19,7 +19,9 @@ Requer: pip install pyserial
 """
 
 import struct
+import time
 import serial
+from pathlib import Path
 
 PORTA = "COM8"
 BAUD = 921600  # deve ser IGUAL ao Serial.begin() no .ino
@@ -30,6 +32,7 @@ SYNC_BYTE_2 = 0x55
 FORMATO_AMOSTRA = "<IBf"          # uint32, uint8, float -> 9 bytes
 TAM_AMOSTRA = struct.calcsize(FORMATO_AMOSTRA)
 
+valor_sps = "500SPS"
 N_CHANNELS = 8
 N_SAMPLES_PER_CHANNEL = 10000
 AMOSTRAS_POR_ARQUIVO = N_CHANNELS * N_SAMPLES_PER_CHANNEL  # 80000, igual ao TOTAL_SAMPLES do .ino
@@ -38,56 +41,122 @@ N_ARQUIVOS = 5
 PROGRESSO_A_CADA = 2000  # imprime status no console a cada N amostras (em vez de a cada 1)
 
 
-def ler_pacote(ser: serial.Serial):
-    """Le e decodifica um unico pacote. Retorna lista de tuplas (indice, canal, tensao)."""
+SENTINELA = b"READY_BINARY_STREAM"
 
-    # Procura o sincronismo byte a byte
+
+def conectar_serial(porta: str, baud: int, intervalo_s: float = 1.0) -> serial.Serial:
+    """
+    Tenta abrir a porta serial repetidamente ate ter sucesso. Permite deixar
+    o script em "standby" antes mesmo do ESP32 estar conectado/ligado.
+    """
+    tentativa = 0
+    while True:
+        tentativa += 1
+        try:
+            ser = serial.Serial(porta, baud, timeout=1)
+            print(f"Conectado em {porta} @ {baud} bps")
+            return ser
+        except serial.SerialException:
+            print(f"  Aguardando dispositivo em {porta}...", end="\r")
+            time.sleep(intervalo_s)
+
+
+def esperar_pronto(ser: serial.Serial):
+    """
+    Le e imprime linhas de texto (boot do ESP32 + mensagens de depuracao do
+    setup()) ate encontrar a linha sentinela. So entao e seguro comecar a
+    interpretar os bytes recebidos como pacotes binarios - isso evita contar
+    o banner de boot e os prints de depuracao como "pacotes com erro".
+    """
+    buffer = b""
+    print("Aguardando ESP32 inicializar...")
+    while True:
+        byte = ser.read(1)
+        if not byte:
+            continue  # timeout, continua aguardando
+
+        buffer += byte
+        if byte == b"\n":
+            linha = buffer.strip()
+            if linha:
+                print(f"  [ESP32] {linha.decode(errors='replace')}")
+            if linha == SENTINELA:
+                print("Sentinela recebida - iniciando leitura binaria.\n")
+                return
+            buffer = b""
+
+
+def ler_pacote(ser: serial.Serial):
+    """
+    Le e decodifica um unico pacote. Retorna:
+      - lista de tuplas (indice, canal, tensao) em caso de sucesso
+      - [] (lista vazia) se nao havia dados disponiveis (timeout simples,
+        esperado durante as pausas do ESP32 entre rajadas) - NAO e um erro
+      - None se houve uma falha real de protocolo (sync perdido apos dados
+        comecarem a chegar, pacote incompleto ou checksum invalido)
+    """
+ 
+    # Primeiro byte: se der timeout aqui, e apenas silencio do ESP32
+    # (ex: durante o vTaskDelay entre rajadas) - nao conta como erro.
     b = ser.read(1)
-    if not b or b[0] != SYNC_BYTE_1:
-        return None
+    if not b:
+        return []
+    if b[0] != SYNC_BYTE_1:
+        return None  # byte de lixo em meio ao fluxo -- erro real de sync
+ 
     b = ser.read(1)
     if not b or b[0] != SYNC_BYTE_2:
         return None
-
+ 
     n_bytes = ser.read(1)
     if not n_bytes:
         return None
     n = n_bytes[0]
-
+ 
     payload = ser.read(n * TAM_AMOSTRA)
     if len(payload) != n * TAM_AMOSTRA:
         return None
-
+ 
     checksum_lido = ser.read(1)
     if not checksum_lido:
         return None
-
+ 
     checksum_calc = 0
     for byte in payload:
         checksum_calc ^= byte
-
+ 
     if checksum_calc != checksum_lido[0]:
         print("Checksum invalido, pacote descartado.")
         return None
-
+ 
     amostras = []
     for i in range(n):
         trecho = payload[i * TAM_AMOSTRA:(i + 1) * TAM_AMOSTRA]
         indice, canal, tensao = struct.unpack(FORMATO_AMOSTRA, trecho)
         amostras.append((indice, canal, tensao))
-
+ 
     return amostras
 
 
 def main():
-    with serial.Serial(PORTA, BAUD, timeout=1) as ser:
-        print(f"Conectado em {PORTA} @ {BAUD} bps")
+    print("Script em standby - aguardando o ESP32 ficar disponivel na porta "
+          f"{PORTA}. Pode ligar/conectar o ESP32 a qualquer momento.")
 
+    dir_path = Path(f"dados/{valor_sps}")
+
+    dir_path.mkdir(parents=True, exist_ok=True)
+
+    ser = conectar_serial(PORTA, BAUD)
+    with ser:
         # Descarta qualquer dado antigo/parcial que possa estar no buffer
         ser.reset_input_buffer()
 
+        # Consome o banner de boot do ESP32 e os prints de depuracao do
+        # setup(), sem contá-los como erros, ate a sentinela de "pronto"
+        esperar_pronto(ser)
+
         for i in range(N_ARQUIVOS):
-            nome_arquivo = f"coleta{i}.csv"
+            nome_arquivo = f"{dir_path}\\coleta{i}.csv"
             print(f"\n=== Iniciando coleta {i} -> {nome_arquivo} "
                   f"({AMOSTRAS_POR_ARQUIVO} amostras esperadas) ===")
 
@@ -110,13 +179,15 @@ def main():
 
                         if total_amostras % PROGRESSO_A_CADA == 0:
                             print(f"  {total_amostras}/{AMOSTRAS_POR_ARQUIVO} amostras "
-                                  f"(erros de pacote: {pacotes_com_erro})")
+                                  f"(erros de pacote: {pacotes_com_erro})     ",
+                                  end="\r", flush=True)
 
                     # Escreve em lote (mais eficiente que linha a linha)
                     arquivo.writelines(buffer_linhas)
                     buffer_linhas.clear()
                     arquivo.flush()
 
+            print()  # pula para uma nova linha antes do resumo, para nao sobrescrever o progresso
             print(f"Coleta {i} finalizada: {total_amostras} amostras salvas em {nome_arquivo} "
                   f"(pacotes com erro/descartados: {pacotes_com_erro})")
 

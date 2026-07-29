@@ -48,22 +48,22 @@ int pgaValues[7] = { PGA_1, PGA_2, PGA_4, PGA_8, PGA_16, PGA_32, PGA_64 };  // A
 int pgaSelection = 0;                                                       // Índice do PGA escolhido
 
 int drateValues[16] = {
-  DRATE_30000SPS,
-  DRATE_15000SPS,
-  DRATE_7500SPS,
-  DRATE_3750SPS,
-  DRATE_2000SPS,
-  DRATE_1000SPS,
-  DRATE_500SPS,
-  DRATE_100SPS,
-  DRATE_60SPS,
-  DRATE_50SPS,
-  DRATE_30SPS,
-  DRATE_25SPS,
-  DRATE_15SPS,
-  DRATE_10SPS,
-  DRATE_5SPS,
-  DRATE_2SPS
+  DRATE_30000SPS,   // 0
+  DRATE_15000SPS,   // 1
+  DRATE_7500SPS,    // 2
+  DRATE_3750SPS,    // 3
+  DRATE_2000SPS,    // 4
+  DRATE_1000SPS,    // 5
+  DRATE_500SPS,     // 6
+  DRATE_100SPS,     // 7
+  DRATE_60SPS,      // 8
+  DRATE_50SPS,      // 9
+  DRATE_30SPS,      // 10
+  DRATE_25SPS,      // 11
+  DRATE_15SPS,      // 12
+  DRATE_10SPS,      // 13
+  DRATE_5SPS,       // 14
+  DRATE_2SPS        // 15
 };  // Array com as taxas de amostragem
 
 int drateSelection = 0;  // Índice da taxa de amostragem escolhida (0 = 30000 SPS)
@@ -138,7 +138,6 @@ void taskADS1256(void *pvParameters) {
 
     while (true) {
         // cycleSingle() sempre cicla pelos 8 canais na ordem SING_0..SING_7
-        // (o canal correspondente à i-ésima chamada é sempre i % N_CHANNELS)
         for (uint32_t i = 0; i < TOTAL_SAMPLES; i++) {
             AmostraADS amostra;
             amostra.tensao = A.convertToVoltage(A.cycleSingle());
@@ -248,7 +247,13 @@ void setup() {
         0                   // núcleo 0
     );
 
-    Serial.println("Tasks criadas. Streaming binario iniciado (pare o monitor serie de texto).");
+    Serial.println("Tasks criadas.");
+
+    // Sentinela: marca o fim de todo o texto de depuracao. A partir daqui,
+    // NENHUM outro Serial.print/println deve ser usado - só o protocolo binario.
+    // O script Python espera por esta linha exata antes de comecar a interpretar
+    // os bytes recebidos como pacotes binarios.
+    Serial.println("READY_BINARY_STREAM");
 }
 
 void loop() {}
