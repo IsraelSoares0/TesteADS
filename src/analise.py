@@ -10,9 +10,7 @@ def carregar_dados(file) -> pd.DataFrame:
     """Carrega o arquivo de dados."""
     try:
         df_total = pd.read_csv(
-            file,
-            header=None,
-            names=["amostra", "tensao", "ch"]
+            file
         )
         if df_total.shape[1] < 3:
             raise ValueError
@@ -20,13 +18,13 @@ def carregar_dados(file) -> pd.DataFrame:
         st.error("Arquivo inválido.")
         st.stop()
     
-    df_total["amostra"] = df_total["amostra"].astype(int)
-    df_total["tensao"] = df_total["tensao"].astype(float)
-    df_total["ch"] = df_total["ch"].astype(int)    
+    df_total["indice"] = df_total["indice"].astype(int)
+    df_total["canal"] = df_total["canal"].astype(int)
+    df_total["tensao"] = df_total["tensao"].astype(float)    
 
     dados_por_canal = {
         canal: grupo.reset_index(drop=True)
-        for canal, grupo in df_total.groupby("ch")
+        for canal, grupo in df_total.groupby("canal")
     }
 
     return df_total, dados_por_canal
@@ -71,7 +69,7 @@ def obter_estatisticas(df: pd.DataFrame, tensao_esperada: float) -> dict:
     maximo = tensoes.max()
     
     ruido = maximo - minimo
-    canal = df["ch"].unique()
+    canal = df["canal"].unique()
     
     estatisticas = {
         "canal": canal,
@@ -100,8 +98,6 @@ def obter_estatisticas_por_canal(dados_por_canal: dict, tensao_esperada: float) 
 
 
 if __name__ == "__main__":
-    dados_por_canal = carregar_dados("dados/coleta_teste.csv")
-    
-    estatisticas = obter_estatisticas_por_canal(dados_por_canal, 1.650)
+    dados_por_canal = carregar_dados("dados/500SPS/coleta0.csv")
     
     print(dados_por_canal[0].head())

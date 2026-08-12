@@ -135,11 +135,12 @@ void enviarPacote(AmostraADS *buffer, uint8_t n) {
 
 void taskADS1256(void *pvParameters) {
     uint32_t indiceGlobal = 0;
+    uint32_t num_coleta = 0;
+    AmostraADS amostra;
 
     while (true) {
         // cycleSingle() sempre cicla pelos 8 canais na ordem SING_0..SING_7
         for (uint32_t i = 0; i < TOTAL_SAMPLES; i++) {
-            AmostraADS amostra;
             amostra.tensao = A.convertToVoltage(A.cycleSingle());
             amostra.canal  = (uint8_t)(i % N_CHANNELS);
             amostra.indice = indiceGlobal++;
@@ -157,6 +158,13 @@ void taskADS1256(void *pvParameters) {
         }
 
         A.stopConversion();
+        
+        Serial.println("Coleta %s Finalizada -- %s", num_coleta, drateValues[drateSelection]);
+
+        Serial.println("END_OF_REPORT");
+        
+        indiceGlobal = 0;
+        num_coleta++;
 
         // Aguarda antes de iniciar a próxima coleta de 10000 amostras/canal
         vTaskDelay(pdMS_TO_TICKS(5000));

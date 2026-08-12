@@ -114,7 +114,7 @@ df_total, dados_por_canal = an.carregar_dados(file)
 
 st.subheader("Gráfico dos Canais")
 
-canais_disponiveis = sorted(df_total["ch"].unique())
+canais_disponiveis = sorted(df_total["canal"].unique())
 
 canais_selecionados = st.multiselect(
     "Selecione os canais para visualizar:",
@@ -122,20 +122,20 @@ canais_selecionados = st.multiselect(
     default=canais_disponiveis
 )
 
-df_plot = df_total[df_total["ch"].isin(canais_selecionados)].copy()
-df_plot["ch"] = df_plot["ch"].astype(str)
+df_plot = df_total[df_total["canal"].isin(canais_selecionados)].copy()
+df_plot["canal"] = df_plot["canal"].astype(str)
 
 fig = px.line(
     df_plot,
-    x="amostra",
+    x="indice",
     y="tensao",
-    color="ch",
+    color="canal",
     markers=False,
     title="Tensão medida por amostra",
     labels={
-        "amostra": "Número da amostra",
+        "indice": "Número da amostra",
         "tensao": "Tensão medida (V)",
-        "ch": "Canal"
+        "canal": "Canal"
     }
 )
 

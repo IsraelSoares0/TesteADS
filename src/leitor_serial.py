@@ -42,6 +42,7 @@ PROGRESSO_A_CADA = 2000  # imprime status no console a cada N amostras (em vez d
 
 
 SENTINELA = b"READY_BINARY_STREAM"
+FINALIZADO = b"END_OF_REPORT"
 
 
 def conectar_serial(porta: str, baud: int, intervalo_s: float = 1.0) -> serial.Serial:
@@ -61,19 +62,16 @@ def conectar_serial(porta: str, baud: int, intervalo_s: float = 1.0) -> serial.S
             time.sleep(intervalo_s)
 
 
-def esperar_pronto(ser: serial.Serial):
+def ler_serial(ser: serial.Serial):
     """
     Le e imprime linhas de texto (boot do ESP32 + mensagens de depuracao do
-    setup()) ate encontrar a linha sentinela. So entao e seguro comecar a
-    interpretar os bytes recebidos como pacotes binarios - isso evita contar
-    o banner de boot e os prints de depuracao como "pacotes com erro".
+    setup()) ate encontrar a linha sentinela.
     """
     buffer = b""
-    print("Aguardando ESP32 inicializar...")
     while True:
         byte = ser.read(1)
         if not byte:
-            continue  # timeout, continua aguardando
+            continue  # timeout
 
         buffer += byte
         if byte == b"\n":
@@ -81,8 +79,10 @@ def esperar_pronto(ser: serial.Serial):
             if linha:
                 print(f"  [ESP32] {linha.decode(errors='replace')}")
             if linha == SENTINELA:
-                print("Sentinela recebida - iniciando leitura binaria.\n")
+                print("Sentinela recebida -- iniciando leitura binaria.\n")
                 return
+            if linha == FINALIZADO:
+                print("Iniciando nova coleta...")
             buffer = b""
 
 
@@ -148,12 +148,12 @@ def main():
 
     ser = conectar_serial(PORTA, BAUD)
     with ser:
-        # Descarta qualquer dado antigo/parcial que possa estar no buffer
         ser.reset_input_buffer()
 
         # Consome o banner de boot do ESP32 e os prints de depuracao do
         # setup(), sem contá-los como erros, ate a sentinela de "pronto"
-        esperar_pronto(ser)
+        print("Aguardando ESP32 inicializar...")
+        ler_serial(ser)
 
         for i in range(N_ARQUIVOS):
             nome_arquivo = f"{dir_path}\\coleta{i}.csv"
@@ -187,10 +187,12 @@ def main():
                     buffer_linhas.clear()
                     arquivo.flush()
 
-            print()  # pula para uma nova linha antes do resumo, para nao sobrescrever o progresso
-            print(f"Coleta {i} finalizada: {total_amostras} amostras salvas em {nome_arquivo} "
-                  f"(pacotes com erro/descartados: {pacotes_com_erro})")
-
+            print()
+            
+            print(f"Amostras salvas em {nome_arquivo} -- (pacotes com erro/descartados: {pacotes_com_erro})")
+            
+            ler_serial(ser)
+            
 
 if __name__ == "__main__":
     main()
