@@ -175,7 +175,6 @@ void taskADS1256(void *pvParameters) {
 
         RelatorioColeta rel;
         rel.num_coleta  = num_coleta;
-        rel.drate_value = drateValues[drateSelection];
         rel.tempo_ms    = endTime;
         xQueueSend(filaRelatorios, &rel, portMAX_DELAY);
 
@@ -220,10 +219,10 @@ void taskSerialSend(void *pvParameters) {
             if (xQueueReceive(filaRelatorios, &rel, 0) == pdPASS) {
                 Serial.print("Coleta ");
                 Serial.print(rel.num_coleta);
-                Serial.print(" Finalizada -- ");
-                Serial.println(rel.drate_value);
                 Serial.print("Tempo: ");
                 Serial.print(rel.tempo_ms);
+                Serial.print("Amostragem media: ");
+                Serial.print(80000 / (rel.tempo_ms * 0.001));
                 Serial.println(" ms");
                 Serial.println("END_OF_REPORT");
             }
