@@ -143,7 +143,7 @@ def main():
     print("Script em standby - aguardando o ESP32 ficar disponivel na porta "
           f"{PORTA}. Pode ligar/conectar o ESP32 a qualquer momento.")
 
-    dir_path = Path(f"coleta2/{valor_sps}")
+    dir_path = Path(f"rodada2/{valor_sps}")
 
     dir_path.mkdir(parents=True, exist_ok=True)
 
