@@ -221,9 +221,10 @@ void taskSerialSend(void *pvParameters) {
                 Serial.print(rel.num_coleta);
                 Serial.print("Tempo: ");
                 Serial.print(rel.tempo_ms);
+                Serial.println(" ms");
                 Serial.print("Amostragem media: ");
                 Serial.print(80000 / (rel.tempo_ms * 0.001));
-                Serial.println(" ms");
+                Serial.println(" SPS")
                 Serial.println("END_OF_REPORT");
             }
         }
