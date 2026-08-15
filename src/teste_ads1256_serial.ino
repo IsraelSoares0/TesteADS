@@ -224,7 +224,7 @@ void taskSerialSend(void *pvParameters) {
                 Serial.println(" ms");
                 Serial.print("Amostragem media: ");
                 Serial.print(80000 / (rel.tempo_ms * 0.001));
-                Serial.println(" SPS")
+                Serial.println(" SPS");
                 Serial.println("END_OF_REPORT");
             }
         }

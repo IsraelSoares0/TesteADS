@@ -12,34 +12,44 @@ Sentinela recebida -- iniciando leitura binaria.
 === Iniciando coleta 0 -> rodada3\1000SPS\coleta0_1000SPS.csv (80000 amostras esperadas) ===
   80000/80000 amostras (erros de pacote: 0)     
 Amostras salvas em rodada3\1000SPS\coleta0_1000SPS.csv -- (pacotes com erro/descartados: 0)
-  [ESP32] Coleta 0 | Tempo: 96317 ms | Amostragem media: 830.59
+  [ESP32] Coleta 0
+  [ESP32] Tempo: 96318 ms
+  [ESP32] Amostragem media: 830.58 SPS
   [ESP32] END_OF_REPORT
 Iniciando nova coleta...
 
 === Iniciando coleta 1 -> rodada3\1000SPS\coleta1_1000SPS.csv (80000 amostras esperadas) ===
   80000/80000 amostras (erros de pacote: 0)     
 Amostras salvas em rodada3\1000SPS\coleta1_1000SPS.csv -- (pacotes com erro/descartados: 0)
-  [ESP32] Coleta 1 | Tempo: 96316 ms | Amostragem media: 830.60
+  [ESP32] Coleta 1
+  [ESP32] Tempo: 96319 ms
+  [ESP32] Amostragem media: 830.57 SPS
   [ESP32] END_OF_REPORT
 Iniciando nova coleta...
 
 === Iniciando coleta 2 -> rodada3\1000SPS\coleta2_1000SPS.csv (80000 amostras esperadas) ===
   80000/80000 amostras (erros de pacote: 0)     
 Amostras salvas em rodada3\1000SPS\coleta2_1000SPS.csv -- (pacotes com erro/descartados: 0)
-  [ESP32] Coleta 2 | Tempo: 96316 ms | Amostragem media: 830.60
+  [ESP32] Coleta 2
+  [ESP32] Tempo: 96319 ms
+  [ESP32] Amostragem media: 830.57 SPS
   [ESP32] END_OF_REPORT
 Iniciando nova coleta...
 
 === Iniciando coleta 3 -> rodada3\1000SPS\coleta3_1000SPS.csv (80000 amostras esperadas) ===
   80000/80000 amostras (erros de pacote: 0)     
 Amostras salvas em rodada3\1000SPS\coleta3_1000SPS.csv -- (pacotes com erro/descartados: 0)
-  [ESP32] Coleta 3 | Tempo: 96316 ms | Amostragem media: 830.60
+  [ESP32] Coleta 3
+  [ESP32] Tempo: 96319 ms
+  [ESP32] Amostragem media: 830.57 SPS
   [ESP32] END_OF_REPORT
 Iniciando nova coleta...
 
 === Iniciando coleta 4 -> rodada3\1000SPS\coleta4_1000SPS.csv (80000 amostras esperadas) ===
   80000/80000 amostras (erros de pacote: 0)     
 Amostras salvas em rodada3\1000SPS\coleta4_1000SPS.csv -- (pacotes com erro/descartados: 0)
-  [ESP32] Coleta 4 | Tempo: 96316 ms | Amostragem media: 830.60
+  [ESP32] Coleta 4
+  [ESP32] Tempo: 96319 ms
+  [ESP32] Amostragem media: 830.57 SPS
   [ESP32] END_OF_REPORT
 Iniciando nova coleta...

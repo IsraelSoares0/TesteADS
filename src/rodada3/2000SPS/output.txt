@@ -1,0 +1,55 @@
+Script em standby - aguardando o ESP32 ficar disponivel na porta COM8. Pode ligar/conectar o ESP32 a qualquer momento.
+Conectado em COM8 @ 921600 bpsM8...
+Aguardando ESP32 inicializar...
+  [ESP32] STATUS ADS1256: 110110
+  [ESP32] ADS1256 inicializado.
+  [ESP32] Iniciando tasks FreeRTOS...
+  [ESP32] Tasks criadas.
+  [ESP32] READY_BINARY_STREAM
+Sentinela recebida -- iniciando leitura binaria.
+
+
+=== Iniciando coleta 0 -> rodada3\2000SPS\coleta0_2000SPS.csv (80000 amostras esperadas) ===
+  80000/80000 amostras (erros de pacote: 0)     
+Amostras salvas em rodada3\2000SPS\coleta0_2000SPS.csv -- (pacotes com erro/descartados: 0)
+  [ESP32] Coleta 0
+  [ESP32] Tempo: 56342 ms
+  [ESP32] Amostragem media: 1419.90 SPS
+  [ESP32] END_OF_REPORT
+Iniciando nova coleta...
+
+=== Iniciando coleta 1 -> rodada3\2000SPS\coleta1_2000SPS.csv (80000 amostras esperadas) ===
+  80000/80000 amostras (erros de pacote: 0)     
+Amostras salvas em rodada3\2000SPS\coleta1_2000SPS.csv -- (pacotes com erro/descartados: 0)
+  [ESP32] Coleta 1
+  [ESP32] Tempo: 56343 ms
+  [ESP32] Amostragem media: 1419.87 SPS
+  [ESP32] END_OF_REPORT
+Iniciando nova coleta...
+
+=== Iniciando coleta 2 -> rodada3\2000SPS\coleta2_2000SPS.csv (80000 amostras esperadas) ===
+  80000/80000 amostras (erros de pacote: 0)     
+Amostras salvas em rodada3\2000SPS\coleta2_2000SPS.csv -- (pacotes com erro/descartados: 0)
+  [ESP32] Coleta 2
+  [ESP32] Tempo: 56343 ms
+  [ESP32] Amostragem media: 1419.87 SPS
+  [ESP32] END_OF_REPORT
+Iniciando nova coleta...
+
+=== Iniciando coleta 3 -> rodada3\2000SPS\coleta3_2000SPS.csv (80000 amostras esperadas) ===
+  80000/80000 amostras (erros de pacote: 0)     
+Amostras salvas em rodada3\2000SPS\coleta3_2000SPS.csv -- (pacotes com erro/descartados: 0)
+  [ESP32] Coleta 3
+  [ESP32] Tempo: 56344 ms
+  [ESP32] Amostragem media: 1419.85 SPS
+  [ESP32] END_OF_REPORT
+Iniciando nova coleta...
+
+=== Iniciando coleta 4 -> rodada3\2000SPS\coleta4_2000SPS.csv (80000 amostras esperadas) ===
+  80000/80000 amostras (erros de pacote: 0)     
+Amostras salvas em rodada3\2000SPS\coleta4_2000SPS.csv -- (pacotes com erro/descartados: 0)
+  [ESP32] Coleta 4
+  [ESP32] Tempo: 56343 ms
+  [ESP32] Amostragem media: 1419.87 SPS
+  [ESP32] END_OF_REPORT
+Iniciando nova coleta...
