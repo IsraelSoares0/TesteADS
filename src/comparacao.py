@@ -73,6 +73,14 @@ if arquivos_comparacao:
         tensao_esperada=tensao_esperada,
     )
 
-    st.plotly_chart(fig_comparacao, width="stretch")
+    st.plotly_chart(
+        fig_comparacao, 
+        width="stretch",
+        config={
+            "toImageButtonOptions": {
+                "filename": f"comparacao_canal{canal_comparacao}",
+                "format": "png",
+            }
+        })
 else:
     st.info("Faça o upload de dois ou mais arquivos acima para habilitar a comparação.")
