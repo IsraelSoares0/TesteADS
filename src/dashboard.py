@@ -54,46 +54,28 @@ st.html(
     """
 )
 
+st.html(
+    """
+    <p style="text-align: center">Informe a tensão esperada do circuito.</p>
+    """
+)
+
+tensao_esperada = st.number_input("Tensão", value=1.650)
+
+st.html(
+    """
+    <p style="text-align: center"> Upload do arquivo CSV </p>
+    """
+)
+    
+file = st.file_uploader(
+    label="Upload do arquivo CSV",
+    accept_multiple_files=False,
+    type=["csv", "txt"],
+    label_visibility="collapsed",
+)
+
 st.divider()
-
-
-# ===============================
-# Sidebar
-# ===============================
-
-
-with st.sidebar:
-    # TODO: Obter Logo Atualizada
-    st.image("assets/logo.png")
-    
-    st.html(
-        """
-        <p style="text-align: center; color: lightgray; font-size: 13px">Potiguar Rocket Design</p>
-        <hr style="color: gray">
-        """
-    )
-    
-    st.html(
-        """
-        <p style="text-align: center"> Upload do arquivo CSV </p>
-        """
-    )
-    
-    file = st.file_uploader(
-        label="Upload do arquivo CSV",
-        accept_multiple_files=False,
-        type=["csv", "txt"],
-        label_visibility="collapsed",
-    )
-    
-    st.html(
-        """
-        <p style="text-align: center">Informe a tensão esperada do circuito.</p>
-        """
-    )
-    
-    tensao_esperada = st.number_input("Tensão", value=1.650)
-
 
 # ===============================
 # Upload de Dados
@@ -101,7 +83,6 @@ with st.sidebar:
 
 
 if file is None:
-    st.info("Faça o upload de um arquivo na sidebar para iniciar a análise.")
     st.stop()
 
 df_total, dados_por_canal = an.carregar_dados(file)

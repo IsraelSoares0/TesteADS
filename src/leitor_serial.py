@@ -157,7 +157,7 @@ def main():
         ler_serial(ser)
 
         for i in range(N_ARQUIVOS):
-            nome_arquivo = f"{dir_path}\\coleta{i}.csv"
+            nome_arquivo = f"{dir_path}\\coleta{i}_{valor_sps}.csv"
             print(f"\n=== Iniciando coleta {i} -> {nome_arquivo} "
                   f"({AMOSTRAS_POR_ARQUIVO} amostras esperadas) ===")
 
