@@ -65,7 +65,7 @@ int drateValues[16] = {
   DRATE_2SPS        // 15
 };  // Array com as taxas de amostragem
 
-int drateSelection = 5;  // Índice da taxa de amostragem escolhida (0 = 30000 SPS)
+int drateSelection = 0;  // Índice da taxa de amostragem escolhida (0 = 30000 SPS)
 
 // =============================
 // Parâmetros da coleta
@@ -218,7 +218,7 @@ void taskSerialSend(void *pvParameters) {
             RelatorioColeta rel;
             if (xQueueReceive(filaRelatorios, &rel, 0) == pdPASS) {
                 Serial.print("Coleta ");
-                Serial.print(rel.num_coleta);
+                Serial.println(rel.num_coleta);
                 Serial.print("Tempo: ");
                 Serial.print(rel.tempo_ms);
                 Serial.println(" ms");
