@@ -40,7 +40,6 @@ SPIClass hspi(HSPI);
 
 #define ADS_VREF        2.500f
 
-// Único objeto do ADC (o antigo objeto duplicado "adc" foi removido)
 ADS1256 A(PIN_DRDY, PIN_RESET, ADS1256::PIN_UNUSED, PIN_CS_ADS, ADS_VREF, &USE_SPI);
 // DRDY, RESET, SYNC(PDWN), CS, VREF(float) - ESP32 WROOM 32 - OK (HSPI+VSPI)
 
@@ -66,7 +65,7 @@ int drateValues[16] = {
   DRATE_2SPS        // 15
 };  // Array com as taxas de amostragem
 
-int drateSelection = 0;  // Índice da taxa de amostragem escolhida (0 = 30000 SPS)
+int drateSelection = 5;  // Índice da taxa de amostragem escolhida (0 = 30000 SPS)
 
 // =============================
 // Parâmetros da coleta
@@ -89,6 +88,14 @@ typedef struct __attribute__((packed)) {
     float    tensao;
 } AmostraADS;
 
+// Relatorio de fim de burst -- enviado por uma fila separada da de amostras,
+// para que APENAS a taskSerialSend escreva na Serial (ver explicacao abaixo).
+typedef struct {
+    uint32_t num_coleta;
+    int      drate_value;
+    long     tempo_ms;
+} RelatorioColeta;
+
 // =============================
 // FreeRTOS
 // =============================
@@ -98,6 +105,7 @@ typedef struct __attribute__((packed)) {
 #define BATCH_TIMEOUT_MS    100     // tempo máx. de espera p/ fechar um pacote parcial
 
 QueueHandle_t filaAmostras;
+QueueHandle_t filaRelatorios;
 
 TaskHandle_t taskADS_Handle;
 TaskHandle_t taskSerial_Handle;
@@ -137,9 +145,13 @@ void taskADS1256(void *pvParameters) {
     uint32_t indiceGlobal = 0;
     uint32_t num_coleta = 0;
     AmostraADS amostra;
+    long startTime;
+    long endTime = 0;
 
     while (true) {
         // cycleSingle() sempre cicla pelos 8 canais na ordem SING_0..SING_7
+        startTime = millis();
+
         for (uint32_t i = 0; i < TOTAL_SAMPLES; i++) {
             amostra.tensao = A.convertToVoltage(A.cycleSingle());
             amostra.canal  = (uint8_t)(i % N_CHANNELS);
@@ -158,11 +170,15 @@ void taskADS1256(void *pvParameters) {
         }
 
         A.stopConversion();
-        
-        Serial.println("Coleta %s Finalizada -- %s", num_coleta, drateValues[drateSelection]);
 
-        Serial.println("END_OF_REPORT");
-        
+        endTime = millis() - startTime;     // Calcula tempo de execução
+
+        RelatorioColeta rel;
+        rel.num_coleta  = num_coleta;
+        rel.drate_value = drateValues[drateSelection];
+        rel.tempo_ms    = endTime;
+        xQueueSend(filaRelatorios, &rel, portMAX_DELAY);
+
         indiceGlobal = 0;
         num_coleta++;
 
@@ -197,13 +213,25 @@ void taskSerialSend(void *pvParameters) {
             count = 0;
             ultimoEnvio = xTaskGetTickCount();
         }
+
+        // Verificacao de relatorio pendente
+        if (count == 0) {
+            RelatorioColeta rel;
+            if (xQueueReceive(filaRelatorios, &rel, 0) == pdPASS) {
+                Serial.print("Coleta ");
+                Serial.print(rel.num_coleta);
+                Serial.print(" Finalizada -- ");
+                Serial.println(rel.drate_value);
+                Serial.print("Tempo: ");
+                Serial.print(rel.tempo_ms);
+                Serial.println(" ms");
+                Serial.println("END_OF_REPORT");
+            }
+        }
     }
 }
 
 void setup() {
-    // Baud elevado para acompanhar o throughput de ~4374 amostras/s (DRATE_30000SPS
-    // cicladas em 8 canais) -> ~39 kB/s necessarios, o que 115200 baud nao suporta.
-    // Lembre-se de manter o mesmo valor em leitor_serial.py (BAUD).
     Serial.begin(921600);
 
     while (!Serial) {
@@ -230,6 +258,14 @@ void setup() {
 
     if (filaAmostras == NULL) {
         Serial.println("Erro ao criar a fila de amostras!");
+        while (true);
+    }
+
+    // Fila de relatorios de fim de burst (pequena, so precisa de poucos slots)
+    filaRelatorios = xQueueCreate(4, sizeof(RelatorioColeta));
+
+    if (filaRelatorios == NULL) {
+        Serial.println("Erro ao criar a fila de relatorios!");
         while (true);
     }
 

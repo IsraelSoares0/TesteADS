@@ -32,7 +32,7 @@ SYNC_BYTE_2 = 0x55
 FORMATO_AMOSTRA = "<IBf"          # uint32, uint8, float -> 9 bytes
 TAM_AMOSTRA = struct.calcsize(FORMATO_AMOSTRA)
 
-valor_sps = "500SPS"
+valor_sps = "30000SPS"
 N_CHANNELS = 8
 N_SAMPLES_PER_CHANNEL = 10000
 AMOSTRAS_POR_ARQUIVO = N_CHANNELS * N_SAMPLES_PER_CHANNEL  # 80000, igual ao TOTAL_SAMPLES do .ino
@@ -83,6 +83,7 @@ def ler_serial(ser: serial.Serial):
                 return
             if linha == FINALIZADO:
                 print("Iniciando nova coleta...")
+                return
             buffer = b""
 
 
@@ -142,7 +143,7 @@ def main():
     print("Script em standby - aguardando o ESP32 ficar disponivel na porta "
           f"{PORTA}. Pode ligar/conectar o ESP32 a qualquer momento.")
 
-    dir_path = Path(f"dados/{valor_sps}")
+    dir_path = Path(f"coleta2/{valor_sps}")
 
     dir_path.mkdir(parents=True, exist_ok=True)
 

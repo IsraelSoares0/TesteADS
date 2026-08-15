@@ -1,0 +1,50 @@
+Script em standby - aguardando o ESP32 ficar disponivel na porta COM8. Pode ligar/conectar o ESP32 a qualquer momento.
+Conectado em COM8 @ 921600 bpsM8...
+Aguardando ESP32 inicializar...
+  [ESP32] STATUS ADS1256: 110110
+  [ESP32] ADS1256 inicializado.
+  [ESP32] Iniciando tasks FreeRTOS...
+  [ESP32] Tasks criadas.
+  [ESP32] READY_BINARY_STREAM
+Sentinela recebida -- iniciando leitura binaria.
+
+
+=== Iniciando coleta 0 -> coleta2\15000SPS\coleta0.csv (80000 amostras esperadas) ===
+  80000/80000 amostras (erros de pacote: 0)     
+Amostras salvas em coleta2\15000SPS\coleta0.csv -- (pacotes com erro/descartados: 0)
+  [ESP32] Coleta 0 Finalizada -- 224
+  [ESP32] Tempo: 22550 ms
+  [ESP32] END_OF_REPORT
+Iniciando nova coleta...
+
+=== Iniciando coleta 1 -> coleta2\15000SPS\coleta1.csv (80000 amostras esperadas) ===
+  80000/80000 amostras (erros de pacote: 0)     
+Amostras salvas em coleta2\15000SPS\coleta1.csv -- (pacotes com erro/descartados: 0)
+  [ESP32] Coleta 1 Finalizada -- 224
+  [ESP32] Tempo: 22550 ms
+  [ESP32] END_OF_REPORT
+Iniciando nova coleta...
+
+=== Iniciando coleta 2 -> coleta2\15000SPS\coleta2.csv (80000 amostras esperadas) ===
+  80000/80000 amostras (erros de pacote: 0)     
+Amostras salvas em coleta2\15000SPS\coleta2.csv -- (pacotes com erro/descartados: 0)
+  [ESP32] Coleta 2 Finalizada -- 224
+  [ESP32] Tempo: 22550 ms
+  [ESP32] END_OF_REPORT
+Iniciando nova coleta...
+
+=== Iniciando coleta 3 -> coleta2\15000SPS\coleta3.csv (80000 amostras esperadas) ===
+  80000/80000 amostras (erros de pacote: 0)     
+Amostras salvas em coleta2\15000SPS\coleta3.csv -- (pacotes com erro/descartados: 0)
+  [ESP32] Coleta 3 Finalizada -- 224
+  [ESP32] Tempo: 22550 ms
+  [ESP32] END_OF_REPORT
+Iniciando nova coleta...
+
+=== Iniciando coleta 4 -> coleta2\15000SPS\coleta4.csv (80000 amostras esperadas) ===
+  80000/80000 amostras (erros de pacote: 0)     
+Amostras salvas em coleta2\15000SPS\coleta4.csv -- (pacotes com erro/descartados: 0)
+  [ESP32] Coleta 4 Finalizada -- 224
+  [ESP32] Tempo: 22550 ms
+  [ESP32] END_OF_REPORT
+Iniciando nova coleta...
