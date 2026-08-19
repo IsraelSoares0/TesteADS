@@ -33,6 +33,7 @@ FORMATO_AMOSTRA = "<IBf"          # uint32, uint8, float -> 9 bytes
 TAM_AMOSTRA = struct.calcsize(FORMATO_AMOSTRA)
 
 valor_sps = "30000SPS"
+rodada = "rodada4"
 N_CHANNELS = 8
 N_SAMPLES_PER_CHANNEL = 10000
 AMOSTRAS_POR_ARQUIVO = N_CHANNELS * N_SAMPLES_PER_CHANNEL  # 80000, igual ao TOTAL_SAMPLES do .ino
@@ -143,7 +144,7 @@ def main():
     print("Script em standby - aguardando o ESP32 ficar disponivel na porta "
           f"{PORTA}. Pode ligar/conectar o ESP32 a qualquer momento.")
 
-    dir_path = Path(f"rodada3/{valor_sps}")
+    dir_path = Path(f"dados/{rodada}/{valor_sps}")
 
     dir_path.mkdir(parents=True, exist_ok=True)
 
